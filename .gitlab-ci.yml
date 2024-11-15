@@ -1,26 +1,122 @@
+# Definición de etapas del pipeline
 stages:
   - install
+  - lint
   - test
   - build
+  - security
   - deploy
 
+# Variables globales
 variables:
   NODE_ENV: 'production'
   CACHE_FOLDER: '.npm'
   DIST_FOLDER: 'dist'
+  NODE_VERSION: '18'
 
-cache:
-  key: ${CI_COMMIT_REF_SLUG}
-  paths:
-    - ${CACHE_FOLDER}/
-
-install_dependencies:
-  stage: install
-  image: node:18 # Cambia según la versión de Node.js que uses
-  script:
-    - echo "Instalando dependencias..."
-    - npm install -g @nestjs/cli
-    - npm ci
-  artifacts:
+# Configuración default para todos los jobs
+default:
+  image: node:${NODE_VERSION}-alpine
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
     paths:
       - ${CACHE_FOLDER}/
+      - node_modules/
+    policy: pull-push
+
+# Instalación de dependencias
+install_dependencies:
+  stage: install
+  script:
+    - echo "Installing dependencies..."
+    - npm ci --cache ${CACHE_FOLDER} --prefer-offline
+  artifacts:
+    paths:
+      - node_modules/
+      - ${CACHE_FOLDER}/
+    expire_in: 1 day
+
+# Análisis de código
+lint:
+  stage: lint
+  script:
+    - echo "Running linter..."
+    - npm run lint
+  dependencies:
+    - install_dependencies
+
+# Tests unitarios
+unit_tests:
+  stage: test
+  script:
+    - echo "Running unit tests..."
+    - npm run test
+  coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+  dependencies:
+    - install_dependencies
+
+# Tests e2e
+e2e_tests:
+  stage: test
+  script:
+    - echo "Running e2e tests..."
+    - npm run test:e2e
+  dependencies:
+    - install_dependencies
+  allow_failure: true
+
+# Build de la aplicación
+build:
+  stage: build
+  script:
+    - echo "Building application..."
+    - npm run build
+  artifacts:
+    paths:
+      - ${DIST_FOLDER}/
+    expire_in: 1 week
+  dependencies:
+    - install_dependencies
+
+# Escaneo de seguridad
+security_scan:
+  stage: security
+  script:
+    - echo "Running security scan..."
+    - npm audit
+    - npx snyk test --severity-threshold=high || true
+  allow_failure: true
+  dependencies:
+    - install_dependencies
+
+# Deploy a staging
+deploy_staging:
+  stage: deploy
+  script:
+    - echo "Deploying to staging..."
+    - npm run deploy:staging
+  environment:
+    name: staging
+  only:
+    - develop
+  dependencies:
+    - build
+
+# Deploy a producción
+deploy_production:
+  stage: deploy
+  script:
+    - echo "Deploying to production..."
+    - npm run deploy:prod
+  environment:
+    name: production
+  only:
+    - main
+  when: manual
+  dependencies:
+    - build
