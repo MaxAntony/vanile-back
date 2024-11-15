@@ -34,11 +34,15 @@ install_dependencies:
     paths:
       - node_modules/
       - ${CACHE_FOLDER}/
+      - package.json
+      - package-lock.json
     expire_in: 1 day
 
 # Análisis de código
 lint:
   stage: lint
+  before_script:
+    - npm i -g eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin
   script:
     - echo "Running linter..."
     - npm run lint
