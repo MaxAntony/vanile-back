@@ -42,3 +42,4 @@ build_app:
     expire_in: 1 week
   dependencies:
     - install_dependencies
+# agregar un stage mas para publicar en docker hub y actualizar en portainer o en el vps
