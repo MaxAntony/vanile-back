@@ -19,45 +19,10 @@ before_script:
 
 install_dependencies:
   stage: install
+  image: node:18 # Cambia según la versión de Node.js que uses
   script:
     - echo "Instalando dependencias..."
     - npm ci
   artifacts:
     paths:
       - ${CACHE_FOLDER}/
-
-run_tests:
-  stage: test
-  script:
-    - echo "Ejecutando pruebas..."
-    - npm run test
-  artifacts:
-    reports:
-      junit: test-results.xml
-  only:
-    - merge_requests
-    - main
-
-build_project:
-  stage: build
-  script:
-    - echo "Compilando el proyecto..."
-    - npm run build
-  artifacts:
-    paths:
-      - ${DIST_FOLDER}/
-  only:
-    - merge_requests
-    - main
-
-deploy_to_server:
-  stage: deploy
-  script:
-    - echo "Desplegando en el servidor..."
-    # Ejemplo de despliegue: copia archivos a un servidor remoto
-    - scp -r ${DIST_FOLDER}/* user@server:/var/www/nestjs-app
-  environment:
-    name: production
-    url: http://your-server-url
-  only:
-    - main
