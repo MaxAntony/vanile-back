@@ -18,7 +18,7 @@ cache:
 # Job para instalar dependencias
 install:
   stage: install
-  image: node:${NODE_VERSION}
+  image: node:18
   script:
     - npm ci
   artifacts:
