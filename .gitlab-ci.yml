@@ -8,13 +8,12 @@ stages:
 # Variables globales
 variables:
   NODE_VERSION: "18-alpine"
-  DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: ""
 
-# Cache para node_modules
+# Cache para node_modules y dist
 cache:
   paths:
     - node_modules/
+    - dist/
 
 # Job para instalar dependencias
 install:
@@ -42,66 +41,47 @@ lint:
   stage: test
   image: node:${NODE_VERSION}
   script:
-    - npm ci
     - npm run lint
   dependencies:
     - install
 
-# Job para construir la imagen Docker
+# Job para compilar la aplicación
 build:
   stage: build
-  image: docker:20
-  services:
-    - docker:20-dind
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-  before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  image: node:${NODE_VERSION}
   script:
-    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA .
-    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-    - |
-      if [ "$CI_COMMIT_BRANCH" == "main" ]; then
-        docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:latest
-        docker push $CI_REGISTRY_IMAGE:latest
-      fi
-  only:
-    - main
-    - develop
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+  dependencies:
+    - install
 
 # Job para despliegue en desarrollo
 deploy_dev:
   stage: deploy
-  image: docker:20
-  services:
-    - docker:20-dind
-  variables:
-    DOCKER_HOST: tcp://docker:2375
+  image: node:${NODE_VERSION}
   script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-    # Aquí irían los comandos de despliegue específicos para tu entorno
     - echo "Desplegando en ambiente de desarrollo..."
+    # Aquí irían los comandos de despliegue específicos
   environment:
     name: development
   only:
     - develop
+  dependencies:
+    - build
 
 # Job para despliegue en producción
 deploy_prod:
   stage: deploy
-  image: docker:20
-  services:
-    - docker:20-dind
-  variables:
-    DOCKER_HOST: tcp://docker:2375
+  image: node:${NODE_VERSION}
   script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-    # Aquí irían los comandos de despliegue específicos para tu entorno
     - echo "Desplegando en ambiente de producción..."
+    # Aquí irían los comandos de despliegue específicos
   environment:
     name: production
   only:
     - main
   when: manual
+  dependencies:
+    - build
