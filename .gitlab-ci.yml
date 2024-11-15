@@ -1,45 +1,79 @@
+image: node:18
+
 stages:
-  - install
+  - lint
   - test
   - build
+  - security
+  - deploy
 
-variables:
-  NODE_ENV: test
-  CACHE_DIR: .cache
-
-cache:
-  key: ${CI_COMMIT_REF_SLUG}
-  paths:
-    - node_modules/
-    - ${CACHE_DIR}/
-
-install_dependencies:
-  stage: install
-  image: node:20
-  script:
-    - npm ci
-  artifacts:
+default:
+  interruptible: true # Cancela jobs redundantes en caso de nuevos commits
+  retry: 2 # Reintenta los jobs fallidos hasta 2 veces
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
     paths:
       - node_modules/
-    expire_in: 1 week
+    policy: pull-push # Intenta usar el cache más reciente y luego actualiza
 
-run_tests:
+variables:
+  NODE_ENV: development
+  CI_SECURITY_AUDIT: "true" # Para habilitar auditorías de seguridad condicionales
+
+before_script:
+  - npm ci
+
+lint:
+  stage: lint
+  script:
+    - npm run lint
+  allow_failure: false # El linter no debe fallar
+
+test:
   stage: test
-  image: node:20
   script:
     - npm run test
-  dependencies:
-    - install_dependencies
+    - npm run test:e2e
+  artifacts:
+    reports:
+      junit: test-results.xml
+    paths:
+      - coverage/
+    expire_in: 1 week
+  coverage: '/^Statements\s*:\s*([\d.]+)%/' # Extrae métricas de cobertura si usas Jest
 
-build_app:
+build:
   stage: build
-  image: node:20
   script:
     - npm run build
   artifacts:
     paths:
       - dist/
     expire_in: 1 week
-  dependencies:
-    - install_dependencies
-# agregar un stage mas para publicar en docker hub y actualizar en portainer o en el vps
+
+security_audit:
+  stage: security
+  script:
+    - npm audit --production
+    - npm audit --json > audit-report.json
+  artifacts:
+    reports:
+      dependency_scanning: audit-report.json
+    paths:
+      - audit-report.json
+    expire_in: 1 week
+  only:
+    - main
+
+deploy:
+  stage: deploy
+  variables:
+    NODE_ENV: production
+  script:
+    - echo "Deploying application..."
+    - ls dist # Reemplazar con lógica real de despliegue
+  only:
+    - tags
+  environment:
+    name: production
+    url: https://example.com # Reemplaza con tu URL
