@@ -1,83 +1,122 @@
-# Definición de las etapas del pipeline
+# Definición de etapas del pipeline
 stages:
   - install
+  - lint
   - test
   - build
+  - security
   - deploy
 
 # Variables globales
 variables:
-  NODE_VERSION: "18-alpine"
+  NODE_ENV: 'production'
+  CACHE_FOLDER: '.npm'
+  DIST_FOLDER: 'dist'
+  NODE_VERSION: '18'
 
-# Cache para node_modules y dist
-cache:
-  paths:
-    - node_modules/
-    - dist/
+# Configuración default para todos los jobs
+default:
+  image: node:${NODE_VERSION}-alpine
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - ${CACHE_FOLDER}/
+      - node_modules/
+    policy: pull-push
 
-# Job para instalar dependencias
-install:
+# Instalación de dependencias
+install_dependencies:
   stage: install
-  image: node:18
   script:
-    - npm ci
+    - echo "Installing dependencies..."
+    - npm ci --cache ${CACHE_FOLDER} --prefer-offline
   artifacts:
     paths:
       - node_modules/
+      - ${CACHE_FOLDER}/
+      - package.json
+      - package-lock.json
+    expire_in: 1 day
 
-# Job para ejecutar tests
-test:
-  stage: test
-  image: node:${NODE_VERSION}
-  script:
-    - npm run test
-    - npm run test:e2e
-  coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
-  dependencies:
-    - install
-
-# Job para análisis de código
+# Análisis de código
 lint:
-  stage: test
-  image: node:${NODE_VERSION}
+  stage: lint
+  before_script:
+    - npm i -g eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin
   script:
+    - echo "Running linter..."
     - npm run lint
   dependencies:
-    - install
+    - install_dependencies
 
-# Job para compilar la aplicación
+# Tests unitarios
+unit_tests:
+  stage: test
+  script:
+    - echo "Running unit tests..."
+    - npm run test
+  coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+  dependencies:
+    - install_dependencies
+
+# Tests e2e
+e2e_tests:
+  stage: test
+  script:
+    - echo "Running e2e tests..."
+    - npm run test:e2e
+  dependencies:
+    - install_dependencies
+  allow_failure: true
+
+# Build de la aplicación
 build:
   stage: build
-  image: node:${NODE_VERSION}
   script:
+    - echo "Building application..."
     - npm run build
   artifacts:
     paths:
-      - dist/
+      - ${DIST_FOLDER}/
+    expire_in: 1 week
   dependencies:
-    - install
+    - install_dependencies
 
-# Job para despliegue en desarrollo
-deploy_dev:
-  stage: deploy
-  image: node:${NODE_VERSION}
+# Escaneo de seguridad
+security_scan:
+  stage: security
   script:
-    - echo "Desplegando en ambiente de desarrollo..."
-    # Aquí irían los comandos de despliegue específicos
+    - echo "Running security scan..."
+    - npm audit
+    - npx snyk test --severity-threshold=high || true
+  allow_failure: true
+  dependencies:
+    - install_dependencies
+
+# Deploy a staging
+deploy_staging:
+  stage: deploy
+  script:
+    - echo "Deploying to staging..."
+    - npm run deploy:staging
   environment:
-    name: development
+    name: staging
   only:
     - develop
   dependencies:
     - build
 
-# Job para despliegue en producción
-deploy_prod:
+# Deploy a producción
+deploy_production:
   stage: deploy
-  image: node:${NODE_VERSION}
   script:
-    - echo "Desplegando en ambiente de producción..."
-    # Aquí irían los comandos de despliegue específicos
+    - echo "Deploying to production..."
+    - npm run deploy:prod
   environment:
     name: production
   only:
