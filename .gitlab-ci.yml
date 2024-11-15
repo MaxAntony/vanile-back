@@ -14,14 +14,12 @@ cache:
   paths:
     - ${CACHE_FOLDER}/
 
-before_script:
-  - npm install -g @nestjs/cli
-
 install_dependencies:
   stage: install
   image: node:18 # Cambia según la versión de Node.js que uses
   script:
     - echo "Instalando dependencias..."
+    - npm install -g @nestjs/cli
     - npm ci
   artifacts:
     paths:
