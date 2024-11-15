@@ -42,7 +42,7 @@ install_dependencies:
 lint:
   stage: lint
   before_script:
-    - npm i -g eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin
+    - npm i
   script:
     - echo "Running linter..."
     - npm run lint
