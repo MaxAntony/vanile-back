@@ -4,7 +4,7 @@ stages:
   - build
 
 variables:
-  NODE_ENV: test
+  NODE_ENV: production
   CACHE_DIR: .cache
 
 cache:
