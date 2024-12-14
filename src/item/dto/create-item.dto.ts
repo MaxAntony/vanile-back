@@ -8,10 +8,10 @@ export class CreateItemDto {
   @IsString()
   name: string;
 
-  @ApiProperty({ description: 'Description of the product', example: 'Advanced technology for honey production' })
-  @IsNotEmpty()
-  @IsString()
-  description: string;
+  // @ApiProperty({ description: 'Description of the product', example: 'Advanced technology for honey production' })
+  // @IsNotEmpty()
+  // @IsString()
+  // description: string;
 
   @ApiProperty({ description: 'Price of the product', example: 299.99 })
   @IsNotEmpty()
