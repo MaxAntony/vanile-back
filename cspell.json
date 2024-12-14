@@ -1,1 +1,13 @@
-{"useGitignore":true,"ignorePaths":["node_modules"],"version":"0.2","dictionaryDefinitions":[{"addWords":true,"name":"custom-words","path":"~\/.config\/cspell\/custom-words.txt"},{"addWords":true,"name":"package-names","path":"~\/.config\/cspell\/package-names.txt"}],"words":["datasource","autoincrement"],"dictionaries":["custom-words","package-names"],"language":"en,es","$schema":"https:\/\/raw.githubusercontent.com\/streetsidesoftware\/cspell\/main\/cspell.schema.json"}
+{
+  "useGitignore": true,
+  "ignorePaths": ["node_modules"],
+  "version": "0.2",
+  "dictionaryDefinitions": [
+    { "addWords": true, "name": "custom-words", "path": "~\/.config\/cspell\/custom-words.txt" },
+    { "addWords": true, "name": "package-names", "path": "~\/.config\/cspell\/package-names.txt" }
+  ],
+  "words": ["datasource", "autoincrement"],
+  "dictionaries": ["custom-words", "package-names"],
+  "language": "en,es",
+  "$schema": "https:\/\/raw.githubusercontent.com\/streetsidesoftware\/cspell\/main\/cspell.schema.json"
+}
