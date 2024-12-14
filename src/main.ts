@@ -14,7 +14,6 @@ async function bootstrap() {
   const documentFactory = () =>
     SwaggerModule.createDocument(app, openApiConfig, {
       operationIdFactory: (controllerKey, methodKey, version) => {
-        console.log(controllerKey, methodKey, version);
         const versionPart = version ? `_${version}` : '';
         return `${controllerKey.replace('Controller', '')}_${methodKey}${versionPart}`;
       },
