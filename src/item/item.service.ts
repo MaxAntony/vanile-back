@@ -1,5 +1,7 @@
+import { cloudinary } from '@/cloudinary.config';
 import { DatabaseService } from '@/common/database/database.service';
 import { Injectable } from '@nestjs/common';
+import { UploadApiResponse } from 'cloudinary';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 
@@ -7,9 +9,9 @@ import { UpdateItemDto } from './dto/update-item.dto';
 export class ItemService {
   constructor(private readonly db: DatabaseService) {}
 
-  create(createItemDto: CreateItemDto) {
-    const imageUrl = createItemDto.image;
-    return this.db.item.create({ data: { ...createItemDto, imageUrl } });
+  async create(createItemDto: CreateItemDto) {
+    const uploadResult = await this.uploadImage(createItemDto.image);
+    return this.db.item.create({ data: { name: createItemDto.name, price: createItemDto.price, imageUrl: uploadResult.secure_url } });
   }
 
   findAll() {
@@ -31,5 +33,16 @@ export class ItemService {
 
   deactivate() {
     // return this.db.update
+  }
+
+  async uploadImage(file: Express.Multer.File): Promise<UploadApiResponse> {
+    return new Promise((resolve, reject) => {
+      cloudinary.uploader
+        .upload_stream({ folder: 'saas' }, (error, result) => {
+          if (error) return reject(error);
+          resolve(result);
+        })
+        .end(file.buffer);
+    });
   }
 }

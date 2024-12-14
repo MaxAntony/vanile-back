@@ -3,6 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { CreateItem } from './decorators/item.decorators';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
+import { Item } from './entities/item.entity';
 import { ItemService } from './item.service';
 
 @ApiTags('Item')
@@ -12,15 +13,14 @@ export class ItemController {
 
   @Post()
   @CreateItem()
-  async create(@UploadedFile() file: Express.Multer.File, @Body() createProductDto: CreateItemDto) {
+  async create(@UploadedFile() file: Express.Multer.File, @Body() createItemDto: CreateItemDto) {
     // Upload image to Cloudinary
     // const uploadResult = await this.cloudinaryService.uploadImage(file);
 
-    console.log(file);
-    console.log(createProductDto);
     // Return product with uploaded image URL
+    this.itemService.create({ ...createItemDto, image: file });
     return {
-      ...createProductDto,
+      ...createItemDto,
       // imageUrl: uploadResult.secure_url,
     };
   }
@@ -31,7 +31,7 @@ export class ItemController {
   // }
 
   @Get()
-  findAll() {
+  findAll(): Promise<Item[]> {
     return this.itemService.findAll();
   }
 
