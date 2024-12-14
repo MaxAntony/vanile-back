@@ -1,29 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors } from '@nestjs/common';
-import { ItemService } from './item.service';
+import { Body, Controller, Get, Param, Patch, Post, UploadedFile } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { CreateItem } from './decorators/item.decorators';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiOperation, ApiConsumes, ApiBody, ApiResponse } from '@nestjs/swagger';
+import { ItemService } from './item.service';
 
+@ApiTags('Item')
 @Controller('item')
 export class ItemController {
   constructor(private readonly itemService: ItemService) {}
 
   @Post()
-  @UseInterceptors(FileInterceptor('image'))
-  @ApiOperation({ summary: 'Create a new product with an image' })
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    description: 'Form data for creating a product',
-    type: CreateItemDto,
-  })
-  @ApiResponse({ status: 201, description: 'Product created successfully.' })
-  @ApiResponse({ status: 400, description: 'Invalid input data.' })
-  async createProduct(@UploadedFile() file: Express.Multer.File, @Body() createProductDto: CreateItemDto) {
+  @CreateItem()
+  async create(@UploadedFile() file: Express.Multer.File, @Body() createProductDto: CreateItemDto) {
     // Upload image to Cloudinary
     // const uploadResult = await this.cloudinaryService.uploadImage(file);
 
     console.log(file);
+    console.log(createProductDto);
     // Return product with uploaded image URL
     return {
       ...createProductDto,
@@ -31,10 +25,10 @@ export class ItemController {
     };
   }
 
-  @Post()
-  create(@Body() createItemDto: CreateItemDto) {
-    return this.itemService.create(createItemDto);
-  }
+  // @Post()
+  // create(@Body() createItemDto: CreateItemDto) {
+  //   return this.itemService.create(createItemDto);
+  // }
 
   @Get()
   findAll() {
@@ -51,8 +45,8 @@ export class ItemController {
     return this.itemService.update(+id, updateItemDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.itemService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.itemService.remove(+id);
+  // }
 }

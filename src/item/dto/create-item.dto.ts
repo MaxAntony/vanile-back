@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateItemDto {
   @ApiProperty({ description: 'Name of the product', example: 'Honey Panel X' })
@@ -24,5 +24,6 @@ export class CreateItemDto {
     type: 'string',
     format: 'binary',
   })
+  @IsOptional()
   image: any;
 }

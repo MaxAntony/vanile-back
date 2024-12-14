@@ -1,26 +1,35 @@
+import { DatabaseService } from '@/common/database/database.service';
 import { Injectable } from '@nestjs/common';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 
 @Injectable()
 export class ItemService {
+  constructor(private readonly db: DatabaseService) {}
+
   create(createItemDto: CreateItemDto) {
-    return 'This action adds a new item';
+    const imageUrl = createItemDto.image;
+    return this.db.item.create({ data: { ...createItemDto, imageUrl } });
   }
 
   findAll() {
-    return `This action returns all item`;
+    return this.db.item.findMany();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} item`;
+    return this.db.item.findUnique({ where: { id } });
   }
 
   update(id: number, updateItemDto: UpdateItemDto) {
-    return `This action updates a #${id} item`;
+    const imageUrl = updateItemDto.image;
+    return this.db.item.update({ where: { id }, data: { ...updateItemDto, imageUrl } });
   }
 
   remove(id: number) {
     return `This action removes a #${id} item`;
+  }
+
+  deactivate() {
+    // return this.db.update
   }
 }
