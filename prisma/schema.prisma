@@ -20,9 +20,47 @@ model User {
 }
 
 model Item {
-  id       Int    @id @default(autoincrement())
-  name     String
+  id         Int         @id @default(autoincrement())
+  name       String
   // description String
-  price    Int
-  imageUrl String
+  price      Float
+  imageUrl   String
+  orderItems OrderItem[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
 }
+
+model Order {
+  id          Int         @id @default(autoincrement())
+  totalAmount Float
+  items       OrderItem[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model OrderItem {
+  id      Int   @id @default(autoincrement())
+  orderId Int
+  itemId  Int
+  order   Order @relation(fields: [orderId], references: [id])
+  item    Item  @relation(fields: [itemId], references: [id])
+}
+
+// model Order {
+//   id          Int         @id @default(autoincrement())
+//   totalAmount Float
+//   orderItems  OrderItem[]
+//   createdAt   DateTime    @default(now())
+//   updatedAt   DateTime    @updatedAt
+// }
+//
+// model OrderItem {
+//   id           Int   @id @default(autoincrement())
+//   orderId      Int
+//   itemId       Int
+//   quantity     Int
+//   pricePerUnit Float
+//   subtotal     Float
+//   order        Order @relation(fields: [orderId], references: [id])
+//   product      Item  @relation(fields: [itemId], references: [id])
+// }

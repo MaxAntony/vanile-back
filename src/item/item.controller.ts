@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Param, Patch, Post, UploadedFile } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Item as ItemDB } from '@prisma/client';
 import { CreateItem } from './decorators/item.decorators';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
@@ -13,16 +14,8 @@ export class ItemController {
 
   @Post()
   @CreateItem()
-  async create(@UploadedFile() file: Express.Multer.File, @Body() createItemDto: CreateItemDto) {
-    // Upload image to Cloudinary
-    // const uploadResult = await this.cloudinaryService.uploadImage(file);
-
-    // Return product with uploaded image URL
-    this.itemService.create({ ...createItemDto, image: file });
-    return {
-      ...createItemDto,
-      // imageUrl: uploadResult.secure_url,
-    };
+  async create(@UploadedFile() file: Express.Multer.File, @Body() createItemDto: CreateItemDto): Promise<ItemDB> {
+    return this.itemService.create({ ...createItemDto, image: file });
   }
 
   // @Post()

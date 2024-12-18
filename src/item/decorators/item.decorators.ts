@@ -12,7 +12,6 @@ export function CreateItem() {
       description: 'Form data for creating a product',
       type: CreateItemDto,
     }),
-    ApiResponse({ status: 201, description: 'Product created successfully.' }),
     ApiResponse({ status: 400, description: 'Invalid input data.' }),
   );
 }

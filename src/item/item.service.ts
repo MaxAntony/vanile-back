@@ -11,11 +11,12 @@ export class ItemService {
 
   async create(createItemDto: CreateItemDto) {
     const uploadResult = await this.uploadImage(createItemDto.image);
-    return this.db.item.create({ data: { name: createItemDto.name, price: createItemDto.price, imageUrl: uploadResult.secure_url } });
+    const result = await this.db.item.create({ data: { name: createItemDto.name, price: createItemDto.price, imageUrl: uploadResult.secure_url } });
+    return result;
   }
 
   findAll() {
-    return this.db.item.findMany();
+    return this.db.item.findMany({ orderBy: { createdAt: 'desc' } });
   }
 
   findOne(id: number) {
