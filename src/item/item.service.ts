@@ -11,7 +11,13 @@ export class ItemService {
 
   async create(createItemDto: CreateItemDto) {
     const uploadResult = await this.uploadImage(createItemDto.image);
-    const result = await this.db.item.create({ data: { name: createItemDto.name, price: createItemDto.price, imageUrl: uploadResult.secure_url } });
+    const result = await this.db.item.create({
+      data: {
+        name: createItemDto.name,
+        price: createItemDto.price,
+        imageUrl: uploadResult.secure_url,
+      },
+    });
     return result;
   }
 
@@ -21,6 +27,17 @@ export class ItemService {
 
   findOne(id: number) {
     return this.db.item.findUnique({ where: { id } });
+  }
+
+  search(query: string) {
+    return this.db.item.findMany({
+      where: {
+        name: {
+          contains: query,
+          mode: 'insensitive',
+        },
+      },
+    });
   }
 
   update(id: number, updateItemDto: UpdateItemDto) {

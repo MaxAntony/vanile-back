@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Param, Patch, Post, UploadedFile } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, Patch, Post, Query, UploadedFile } from '@nestjs/common';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Item as ItemDB } from '@prisma/client';
 import { CreateItem } from './decorators/item.decorators';
 import { CreateItemDto } from './dto/create-item.dto';
@@ -22,6 +22,12 @@ export class ItemController {
   // create(@Body() createItemDto: CreateItemDto) {
   //   return this.itemService.create(createItemDto);
   // }
+  @Get('search')
+  @ApiQuery({ name: 'query', required: false, description: 'Texto para buscar items por nombre' })
+  async search(@Query('query') query: string): Promise<Item[]> {
+    if (!query) return this.itemService.findAll();
+    return this.itemService.search(query);
+  }
 
   @Get()
   findAll(): Promise<Item[]> {
