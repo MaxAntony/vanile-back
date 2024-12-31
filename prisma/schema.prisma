@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -22,45 +16,25 @@ model User {
 model Item {
   id         Int         @id @default(autoincrement())
   name       String
-  // description String
   price      Float
   imageUrl   String
-  orderItems OrderItem[]
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
+  orderItems OrderItem[]
 }
 
 model Order {
   id          Int         @id @default(autoincrement())
   totalAmount Float
-  items       OrderItem[]
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
+  items       OrderItem[]
 }
 
 model OrderItem {
   id      Int   @id @default(autoincrement())
   orderId Int
   itemId  Int
-  order   Order @relation(fields: [orderId], references: [id])
   item    Item  @relation(fields: [itemId], references: [id])
+  order   Order @relation(fields: [orderId], references: [id])
 }
-
-// model Order {
-//   id          Int         @id @default(autoincrement())
-//   totalAmount Float
-//   orderItems  OrderItem[]
-//   createdAt   DateTime    @default(now())
-//   updatedAt   DateTime    @updatedAt
-// }
-//
-// model OrderItem {
-//   id           Int   @id @default(autoincrement())
-//   orderId      Int
-//   itemId       Int
-//   quantity     Int
-//   pricePerUnit Float
-//   subtotal     Float
-//   order        Order @relation(fields: [orderId], references: [id])
-//   product      Item  @relation(fields: [itemId], references: [id])
-// }
