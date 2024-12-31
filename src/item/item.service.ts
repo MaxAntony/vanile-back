@@ -46,7 +46,7 @@ export class ItemService {
   }
 
   remove(id: number) {
-    return `This action removes a #${id} item`;
+    return this.db.item.delete({ where: { id } });
   }
 
   deactivate() {

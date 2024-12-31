@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, UploadedFile } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UploadedFile } from '@nestjs/common';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Item as ItemDB } from '@prisma/client';
 import { CreateItem } from './decorators/item.decorators';
@@ -44,8 +44,8 @@ export class ItemController {
     return this.itemService.update(+id, updateItemDto);
   }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.itemService.remove(+id);
-  // }
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.itemService.remove(+id);
+  }
 }
