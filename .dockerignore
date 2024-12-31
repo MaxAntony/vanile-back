@@ -1,0 +1,40 @@
+# Node.js modules
+node_modules
+npm-debug.log
+pnpm-debug.log
+yarn-error.log
+
+# Build output
+dist
+
+# Local environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Prisma files
+prisma/*.log
+prisma/migrations
+
+# Logs
+*.log
+
+# Test and coverage output
+coverage
+*.spec.ts
+*.test.ts
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.swp
+
+# Docker-related files
+Dockerfile.*
+.dockerignore
+
+# Miscellaneous
+.DS_Store
+Thumbs.db
