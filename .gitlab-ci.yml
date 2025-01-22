@@ -22,7 +22,6 @@ variables:
 
 before_script:
   - corepack enable
-  - corepack use
   - pnpm ci
 
 lint:
