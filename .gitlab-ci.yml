@@ -21,19 +21,21 @@ variables:
   CI_SECURITY_AUDIT: 'true' # Para habilitar auditorías de seguridad condicionales
 
 before_script:
-  - npm ci
+  - corepack enable
+  - corepack use
+  - pnpm ci
 
 lint:
   stage: lint
   script:
-    - npm run lint
+    - pnpm run lint
   allow_failure: false # El linter no debe fallar
 
 test:
   stage: test
   script:
-    - npm run test
-    - npm run test:e2e
+    - pnpm run test
+    - pnpm run test:e2e
   artifacts:
     reports:
       junit: test-results.xml
@@ -45,7 +47,7 @@ test:
 build:
   stage: build
   script:
-    - npm run build
+    - pnpm run build
   artifacts:
     paths:
       - dist/
@@ -54,8 +56,8 @@ build:
 security_audit:
   stage: security
   script:
-    - npm audit --production
-    - npm audit --json > audit-report.json
+    - pnpm audit --production
+    - pnpm audit --json > audit-report.json
   artifacts:
     reports:
       dependency_scanning: audit-report.json
