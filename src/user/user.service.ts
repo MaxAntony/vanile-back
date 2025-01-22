@@ -1,5 +1,6 @@
 import { DatabaseService } from '@/common/database/database.service';
 import { Injectable } from '@nestjs/common';
+import { hashSync } from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -7,16 +8,25 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UserService {
   constructor(private readonly db: DatabaseService) {}
 
-  create(createUserDto: CreateUserDto) {
-    return this.db.user.create({ data: createUserDto });
+  async create(createUserDto: CreateUserDto) {
+    const result = await this.db.user.create({ data: { ...createUserDto, password: hashSync(createUserDto.password, 10) } });
+    return 'ok';
   }
 
   findAll() {
     return this.db.user.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(email: string) {
+    const user = await this.db.user.findUnique({ where: { email } });
+
+    const { password, ...result } = user;
+    return result;
+  }
+
+  async findOneWithPassword(email: string) {
+    const user = await this.db.user.findUnique({ where: { email } });
+    return user;
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
