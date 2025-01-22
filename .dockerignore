@@ -16,7 +16,7 @@ dist
 
 # Prisma files
 prisma/*.log
-prisma/migrations
+# prisma/migrations
 
 # Logs
 *.log
