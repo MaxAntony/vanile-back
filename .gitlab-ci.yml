@@ -22,7 +22,7 @@ variables:
 
 before_script:
   - corepack enable
-  - pnpm ci
+  - pnpm i --frozen-lockfile
 
 lint:
   stage: lint
