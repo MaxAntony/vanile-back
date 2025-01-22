@@ -13,7 +13,7 @@ async function bootstrap() {
   // Swagger configs
   const openApiConfig = new DocumentBuilder()
     .setTitle(DATA.appName)
-    .setDescription('Api for the E-Commerce proyect')
+    .setDescription('Api for the E-Commerce project')
     .setVersion('1.0')
     .build();
   const documentFactory = () =>
