@@ -25,5 +25,6 @@ export class CreateItemDto {
     format: 'binary',
   })
   @IsOptional()
+  // eslint-disable-next-line
   image: any;
 }

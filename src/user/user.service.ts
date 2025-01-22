@@ -9,7 +9,7 @@ export class UserService {
   constructor(private readonly db: DatabaseService) {}
 
   async create(createUserDto: CreateUserDto) {
-    const result = await this.db.user.create({ data: { ...createUserDto, password: hashSync(createUserDto.password, 10) } });
+    await this.db.user.create({ data: { ...createUserDto, password: hashSync(createUserDto.password, 10) } });
     return 'ok';
   }
 
@@ -20,8 +20,11 @@ export class UserService {
   async findOne(email: string) {
     const user = await this.db.user.findUnique({ where: { email } });
 
-    const { password, ...result } = user;
-    return result;
+    // const { password: _, ...result } = user;
+    //     return result;
+
+    delete user.password;
+    return user;
   }
 
   async findOneWithPassword(email: string) {
@@ -30,6 +33,7 @@ export class UserService {
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
+    console.log(updateUserDto);
     return `This action updates a #${id} user`;
   }
 

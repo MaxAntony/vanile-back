@@ -36,6 +36,7 @@ export class OrderService {
   }
 
   update(id: number, updateOrderDto: UpdateOrderDto) {
+    console.log(updateOrderDto);
     return `This action updates a #${id} order`;
   }
 
