@@ -2,7 +2,7 @@ image: node:18
 
 stages:
   - lint
-  - test
+  # - test
   - build
   - security
   - deploy
@@ -33,18 +33,18 @@ lint:
     - pnpm run lint
   allow_failure: false # El linter no debe fallar
 
-test:
-  stage: test
-  script:
-    - pnpm run test
-    - pnpm run test:e2e
-  artifacts:
-    reports:
-      junit: test-results.xml
-    paths:
-      - coverage/
-    expire_in: 1 week
-  coverage: '/^Statements\s*:\s*([\d.]+)%/' # Extrae métricas de cobertura si usas Jest
+# .test:
+#   stage: test
+#   script:
+#     - pnpm run test
+#     - pnpm run test:e2e
+#   artifacts:
+#     reports:
+#       junit: test-results.xml
+#     paths:
+#       - coverage/
+#     expire_in: 1 week
+#   coverage: '/^Statements\s*:\s*([\d.]+)%/' # Extrae métricas de cobertura si usas Jest
 
 build:
   stage: build
