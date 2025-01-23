@@ -8,10 +8,11 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  name     String @db.VarChar(255)
-  email    String @unique @db.VarChar(255)
-  password String
+  id           Int            @id @default(autoincrement())
+  name         String         @db.VarChar(255)
+  email        String         @unique @db.VarChar(255)
+  password     String
+  CashRegister CashRegister[]
 }
 
 model Item {
@@ -38,4 +39,36 @@ model OrderItem {
   itemId  Int
   item    Item  @relation(fields: [itemId], references: [id])
   order   Order @relation(fields: [orderId], references: [id])
+}
+
+model CashRegister {
+  id            Int                @id @default(autoincrement())
+  openDate      DateTime           @default(now())
+  closeDate     DateTime?
+  initialAmount Int                @default(0)
+  finalAmount   Int?
+  status        CashRegisterStatus @default(OPEN)
+  userId        Int
+  User          User               @relation(fields: [userId], references: [id])
+  Transactions  Transaction[]
+}
+
+model Transaction {
+  id               Int             @id @default(autoincrement())
+  cashRegisteredId Int
+  type             TransactionType
+  amount           Int
+  description      String
+  createdAt        DateTime        @default(now())
+  CashRegister     CashRegister    @relation(fields: [cashRegisteredId], references: [id])
+}
+
+enum CashRegisterStatus {
+  OPEN
+  CLOSE
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
 }
