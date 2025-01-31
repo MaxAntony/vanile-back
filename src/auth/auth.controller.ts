@@ -21,7 +21,7 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Get('profile')
   getProfile(@Request() req): Promise<AuthProfileResponse> {
-    const user = this.userService.findOne(req.user.mail);
+    const user = this.userService.findOneWithoutPassword(req.user.mail);
     return user;
   }
 }

@@ -17,7 +17,7 @@ export class UserService {
     return this.db.user.findMany();
   }
 
-  async findOne(email: string) {
+  async findOneWithoutPassword(email: string) {
     const user = await this.db.user.findUnique({ where: { email } });
 
     // const { password: _, ...result } = user;
@@ -27,7 +27,7 @@ export class UserService {
     return user;
   }
 
-  async findOneWithPassword(email: string) {
+  async findOne(email: string) {
     const user = await this.db.user.findUnique({ where: { email } });
     return user;
   }
