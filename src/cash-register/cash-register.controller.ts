@@ -1,34 +1,25 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { CashRegisterService } from './cash-register.service';
-import { CreateCashRegisterDto } from './dto/create-cash-register.dto';
-import { UpdateCashRegisterDto } from './dto/update-cash-register.dto';
+import { CloseCashRegisterDto } from './dto/close-cash-register.dto';
+import { OpenCashRegisterDto } from './dto/open-cash-register.dto';
+import { RegisterTransactionDto } from './dto/register-transaction.dto';
 
 @Controller('cash-register')
 export class CashRegisterController {
   constructor(private readonly cashRegisterService: CashRegisterService) {}
 
-  @Post()
-  create(@Body() createCashRegisterDto: CreateCashRegisterDto) {
-    return this.cashRegisterService.create(createCashRegisterDto);
+  @Post('open')
+  async open(@Body() data: OpenCashRegisterDto) {
+    return this.cashRegisterService.openCashRegister(data.userId, data.initialAmount);
   }
 
-  @Get()
-  findAll() {
-    return this.cashRegisterService.findAll();
+  @Post('close')
+  async close(@Body() data: CloseCashRegisterDto) {
+    return this.cashRegisterService.closeCashRegister(data.userId, data.finalAmount);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.cashRegisterService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCashRegisterDto: UpdateCashRegisterDto) {
-    return this.cashRegisterService.update(+id, updateCashRegisterDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.cashRegisterService.remove(+id);
+  @Post('transaction')
+  async registerTransaction(@Body() data: RegisterTransactionDto) {
+    return this.cashRegisterService.registerTransaction(data.userId, data.type, data.amount, data.description);
   }
 }
