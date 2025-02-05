@@ -1,13 +1,24 @@
 import { DatabaseService } from '@/common/database/database.service';
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { TransactionType } from '@prisma/client';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { CashRegisterStatus, TransactionType } from '@prisma/client';
 
 @Injectable()
 export class CashRegisterService {
   constructor(private db: DatabaseService) {}
 
+  async getOpenCashRegister(userId: number) {
+    const cashRegister = await this.db.cashRegister.findFirst({ where: { userId, status: CashRegisterStatus.OPEN } });
+
+    if (!cashRegister) {
+      throw new NotFoundException('No se encontraron cajas abiertas');
+    }
+
+    return cashRegister;
+  }
+
   async openCashRegister(userId: number, initialAmount: number) {
-    const existingCashRegister = await this.db.cashRegister.findFirst({ where: { userId, status: 'OPEN' } });
+    const existingCashRegister = await this.db.cashRegister.findFirst({ where: { userId, status: CashRegisterStatus.OPEN } });
+
     if (existingCashRegister) {
       throw new BadRequestException('el usuario ya tiene un registro caja abierta');
     }
@@ -16,22 +27,22 @@ export class CashRegisterService {
       data: {
         userId,
         initialAmount,
-        status: 'OPEN',
+        status: CashRegisterStatus.OPEN,
         openDate: new Date(),
       },
     });
   }
 
   async closeCashRegister(userId: number, finalAmount: number) {
-    const cashRegister = await this.db.cashRegister.findFirst({ where: { userId, status: 'OPEN' } });
+    const cashRegister = await this.db.cashRegister.findFirst({ where: { userId, status: CashRegisterStatus.OPEN } });
 
-    if (!cashRegister) throw new BadRequestException('no cajas abiertas encontradas para este usuario');
+    if (!cashRegister) throw new BadRequestException('sin cajas abiertas encontradas para este usuario');
 
     return this.db.cashRegister.update({
       where: { id: cashRegister.id },
       data: {
         finalAmount,
-        status: 'CLOSE',
+        status: CashRegisterStatus.CLOSE,
         closeDate: new Date(),
       },
     });
@@ -39,7 +50,7 @@ export class CashRegisterService {
 
   async registerTransaction(userId: number, type: TransactionType, amount: number, description: string) {
     const cashRegister = await this.db.cashRegister.findFirst({
-      where: { userId, status: 'OPEN' },
+      where: { userId, status: CashRegisterStatus.OPEN },
     });
 
     if (!cashRegister) throw new BadRequestException('no se encontraron cajas abiertas para este usuario');
@@ -53,4 +64,6 @@ export class CashRegisterService {
       },
     });
   }
+
+  async cashRegisterResumen(userId: number) {}
 }

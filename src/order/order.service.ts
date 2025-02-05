@@ -28,7 +28,7 @@ export class OrderService {
   }
 
   async findAll() {
-    return await this.db.order.findMany({ include: { items: { include: { item: true } } } });
+    return await this.db.order.findMany({ include: { items: { include: { item: true } } }, orderBy: { createdAt: 'desc' } });
   }
 
   findOne(id: number) {

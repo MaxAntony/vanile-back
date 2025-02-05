@@ -1,6 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
 import './cloudinary.config';
 import { DATA } from './constants';
@@ -26,6 +27,8 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, documentFactory);
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
+
+  app.useLogger(app.get(Logger));
 
   await app.listen(process.env.PORT ?? 3000);
 }
