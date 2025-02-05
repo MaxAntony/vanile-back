@@ -12,8 +12,8 @@ export class OrderService {
         data: {
           totalAmount: createOrderDto.totalAmount,
           items: {
-            create: createOrderDto.itemIds.map((i) => {
-              return { itemId: i };
+            create: createOrderDto.items.map((i) => {
+              return { quantity: i.quantity, itemId: i.id };
             }),
           },
         },

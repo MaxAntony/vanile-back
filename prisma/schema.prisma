@@ -34,11 +34,12 @@ model Order {
 }
 
 model OrderItem {
-  id      Int   @id @default(autoincrement())
-  orderId Int
-  itemId  Int
-  item    Item  @relation(fields: [itemId], references: [id])
-  order   Order @relation(fields: [orderId], references: [id])
+  id       Int   @id @default(autoincrement())
+  orderId  Int
+  itemId   Int
+  quantity Int   @default(0)
+  item     Item  @relation(fields: [itemId], references: [id])
+  order    Order @relation(fields: [orderId], references: [id])
 }
 
 model CashRegister {
