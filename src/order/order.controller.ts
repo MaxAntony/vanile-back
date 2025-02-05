@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { GetOrder } from './dto/get-orders.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderService } from './order.service';
 
@@ -14,7 +15,7 @@ export class OrderController {
   }
 
   @Get()
-  findAll() {
+  findAll(): Promise<GetOrder[]> {
     return this.orderService.findAll();
   }
 

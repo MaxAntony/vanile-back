@@ -1,6 +1,7 @@
 import { DatabaseService } from '@/common/database/database.service';
 import { Injectable } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { GetOrder } from './dto/get-orders.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 
 @Injectable()
@@ -28,7 +29,22 @@ export class OrderService {
   }
 
   async findAll() {
-    return await this.db.order.findMany({ include: { items: { include: { item: true } } }, orderBy: { createdAt: 'desc' } });
+    const a = await this.db.order.findMany({ include: { items: { include: { item: true } } }, orderBy: { createdAt: 'desc' } });
+    const response: GetOrder[] = a.map((e) => {
+      const res: GetOrder = {
+        totalAmount: e.totalAmount,
+        createdAt: e.createdAt,
+        items: e.items.map((f) => {
+          const resitem: GetOrder['items'][number] = {
+            quantity: f.quantity,
+            item: { id: f.item.id, imageUrl: f.item.imageUrl, name: f.item.name, price: f.item.price },
+          };
+          return resitem;
+        }),
+      };
+      return res;
+    });
+    return response;
   }
 
   findOne(id: number) {
