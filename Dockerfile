@@ -2,6 +2,7 @@
 FROM node:22-alpine AS builder
 
 # Configurar entorno para pnpm
+RUN npm i -g corepack@latest
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
