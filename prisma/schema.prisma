@@ -37,7 +37,7 @@ model OrderItem {
   id       Int   @id @default(autoincrement())
   orderId  Int
   itemId   Int
-  quantity Int   @default(0)
+  quantity Int
   item     Item  @relation(fields: [itemId], references: [id])
   order    Order @relation(fields: [orderId], references: [id])
 }
