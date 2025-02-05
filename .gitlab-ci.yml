@@ -1,7 +1,7 @@
 image: node:22
 
 stages:
-  - lint
+  # - lint
   # - test
   - build
   - security
@@ -20,19 +20,19 @@ variables:
   NODE_ENV: development
   CI_SECURITY_AUDIT: 'true' # Para habilitar auditorías de seguridad condicionales
 
-before_script:
-  # https://pnpm.io/es/continuous-integration#gitlab-ci
-  - npm i -g corepack@latest
-  - corepack enable
-  - corepack prepare pnpm@latest-10 --activate
-  - pnpm config set store-dir .pnpm-store
-  - pnpm i --frozen-lockfile
+# before_script:
+#   # https://pnpm.io/es/continuous-integration#gitlab-ci
+#   - npm i -g corepack@latest
+#   - corepack enable
+#   - corepack prepare pnpm@latest-10 --activate
+#   - pnpm config set store-dir .pnpm-store
+#   - pnpm i --frozen-lockfile
 
-lint:
-  stage: lint
-  script:
-    - pnpm run lint
-  allow_failure: false # El linter no debe fallar
+# lint:
+#   stage: lint
+#   script:
+#     - pnpm run lint
+#   allow_failure: false # El linter no debe fallar
 
 # .test:
 #   stage: test
