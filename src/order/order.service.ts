@@ -1,12 +1,16 @@
 import { DatabaseService } from '@/common/database/database.service';
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import axios from 'axios';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { GetOrder } from './dto/get-orders.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 
 @Injectable()
 export class OrderService {
+  private culqiSecretKey = 'sk_test_9c03a8efb19fd128';
+
   constructor(private readonly db: DatabaseService) {}
+
   async create(createOrderDto: CreateOrderDto) {
     const order = await this.db.$transaction(async (tx) => {
       const newOrder = await tx.order.create({
@@ -58,5 +62,30 @@ export class OrderService {
 
   remove(id: number) {
     return `This action removes a #${id} order`;
+  }
+
+  async createCharge(tokenId: string, amount: number, currency: string) {
+    const url = 'https://api.culqi.com/v2/charges';
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.culqiSecretKey}`,
+    };
+    const body = {
+      amount,
+      currency_code: currency,
+      source_id: tokenId,
+      description: 'Pago de prueba',
+      email: 'maxpacami@gmail.com',
+    };
+
+    console.log(body);
+    try {
+      const response = await axios.post(url, body, { headers });
+      console.log(response.data);
+      return response.data;
+    } catch (error) {
+      console.log(error.response);
+      throw new HttpException(error.response.data, error.response.status || HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }

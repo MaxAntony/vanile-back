@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { CreateChargeDTO } from './dto/createCharge.dto';
 import { GetOrder } from './dto/get-orders.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderService } from './order.service';
@@ -12,6 +13,12 @@ export class OrderController {
   create(@Body() createOrderDto: CreateOrderDto) {
     console.log(createOrderDto);
     return this.orderService.create(createOrderDto);
+  }
+
+  @Post('payment')
+  async payment(@Body() createChargeDto: CreateChargeDTO) {
+    console.log(createChargeDto);
+    await this.orderService.createCharge(createChargeDto.tokenId, createChargeDto.amount, createChargeDto.currency);
   }
 
   @Get()

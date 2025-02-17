@@ -13,8 +13,8 @@ export class UserService {
     return 'ok';
   }
 
-  findAll() {
-    return this.db.user.findMany();
+  async findAll() {
+    return await this.db.user.findMany();
   }
 
   async findOneWithoutPassword(email: string) {
