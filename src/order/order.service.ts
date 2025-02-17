@@ -1,4 +1,5 @@
 import { DatabaseService } from '@/common/database/database.service';
+import { MailService } from '@/mail/mail.service';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -9,7 +10,10 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 export class OrderService {
   private culqiSecretKey = 'sk_test_9c03a8efb19fd128';
 
-  constructor(private readonly db: DatabaseService) {}
+  constructor(
+    private readonly db: DatabaseService,
+    private mail: MailService,
+  ) {}
 
   async create(createOrderDto: CreateOrderDto) {
     const order = await this.db.$transaction(async (tx) => {
@@ -28,7 +32,7 @@ export class OrderService {
       });
       return newOrder;
     });
-    console.log(order);
+    this.mail.sendMail(createOrderDto.totalAmount.toString(), order.createdAt.toString()).catch((e) => console.error(e));
     return order;
   }
 
